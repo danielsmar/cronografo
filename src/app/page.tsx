@@ -29,7 +29,7 @@ import {
   NumberInput,
   Input,
 } from "@chakra-ui/react";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Measurement } from "@/controllers/measurements";
 import io from 'socket.io-client';
 
@@ -48,9 +48,7 @@ export default function Page() {
   const [caliber, setCaliber] = useState<String>("0");
   const [fps, setFps] = useState<String>("0");
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const [measurements, setMeasurements] = useState<Measurement[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
+  const [measurements, setMeasurements] = useState<Measurement[]>([]);  
 
   async function fetchMeasurements() {
     try {
@@ -61,15 +59,11 @@ export default function Page() {
       const data = await response.json();
       setMeasurements(data.measurements);
       console.log(`Fetched [${data.measurements.length}] measurements successfully`);
+
     } catch (error) {
       console.error('Error fetching measurements:', error);
     }
   }
-  
-
-  useEffect(() => {    
-    fetchMeasurements();
-  }, []);
 
   useEffect(() => {
     socket.on('serial:data', async (data: ArduinoData) => {
@@ -86,11 +80,9 @@ export default function Page() {
       socket.off('serial:data');
       socket.disconnect();
     };
-  }, [socket]); 
+  }, [socket]);
 
   const handleClick = async () => {
-
-    setIsLoading(true);
 
     const dataToSend = dataArray.map((data) => {
       const joulesValue = parseFloat(data.joules);
@@ -111,13 +103,11 @@ export default function Page() {
       };
     }).filter(data => data !== null); // Filtra os dados inválidos
 
-    try {
-
+    try {    
       if (dataToSend.length === 0) {
         console.error('Nenhum dado para enviar.');
         return;
       }
-
       const response = await fetch('/api/measurements', {
 
         method: 'POST',
@@ -129,18 +119,18 @@ export default function Page() {
       if (!response.ok) {
         throw new Error('Falha ao enviar medições');
       }
-
+      
       console.log('Medições enviadas com sucesso!');
-      // Limpa o array após o envio
-      setDataArray([]);
-
+      
+      setDataArray([]);  
+      
     } catch (error) {
       console.error('Erro ao enviar medições:', error);
-    } finally {      
+    } finally {         
       fetchMeasurements();
       onOpen();
     }
-  }; 
+  };
 
   return (
     <Box minW="100vw" minH="100vh" display="flex" justifyContent="center" alignItems="center" bg="#161616">
@@ -204,7 +194,7 @@ export default function Page() {
                       <Td isNumeric>{measurement.caliber}</Td>
                       <Td isNumeric>{measurement.fps}</Td>
                     </Tr>
-                  )) || []}
+                  ))}
                 </Tbody>
 
               </Table>

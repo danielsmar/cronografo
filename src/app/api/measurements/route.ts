@@ -19,7 +19,7 @@ export async function GET() {
     }
 
     console.log(`Fetched [${measurements.length}] measurements successfully`);
-    return new Response(JSON.stringify({ message: `Fetched [${measurements.length}] measurements successfully` }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ message: `Fetched [${measurements.length}] measurements successfully`, measurements }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (error) {
     console.error(error);
     return new Response(JSON.stringify({ message: 'Error fetching measurements' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
